@@ -1,4 +1,3 @@
-// translator.js - Academic term translation and keyword expansion
 var Translator = {
     dict: {
         '多智能体': ['Multi-Agent', 'Multiagent'],
@@ -91,64 +90,42 @@ var Translator = {
         '涌现能力': ['Emergent Ability'],
         '人类反馈强化学习': ['RLHF']
     },
-
-    _reverse: null,
+    _rev: null,
     getReverse: function() {
-        if (this._reverse) return this._reverse;
-        this._reverse = {};
+        if (this._rev) return this._rev;
+        this._rev = {};
         var self = this;
         Object.keys(self.dict).forEach(function(cn) {
             self.dict[cn].forEach(function(en) {
-                var key = en.toLowerCase();
-                if (!self._reverse[key]) self._reverse[key] = [];
-                self._reverse[key].push(cn);
+                var k = en.toLowerCase();
+                if (!self._rev[k]) self._rev[k] = [];
+                self._rev[k].push(cn);
             });
         });
-        return this._reverse;
+        return this._rev;
     },
-
-    detectLanguage: function(text) {
+    detectLang: function(text) {
         var cn = (text.match(/[\u4e00-\u9fff]/g) || []).length;
         var total = text.replace(/\s/g, '').length;
         return total === 0 ? 'en' : (cn / total > 0.3 ? 'cn' : 'en');
     },
-
     cnToEn: function(text) {
-        var results = [];
-        Object.keys(this.dict).sort(function(a, b) { return b.length - a.length; }).forEach(function(cn) {
-            if (text.includes(cn)) {
-                Translator.dict[cn].forEach(function(en) {
-                    if (results.indexOf(en) === -1) results.push(en);
-                });
-            }
+        var r = [];
+        Object.keys(this.dict).sort(function(a,b){return b.length-a.length}).forEach(function(cn) {
+            if (text.includes(cn)) { Translator.dict[cn].forEach(function(en) { if (r.indexOf(en)===-1) r.push(en); }); }
         });
-        return results.length > 0 ? results : [text];
+        return r.length > 0 ? r : [text];
     },
-
     enToCn: function(text) {
-        var results = [];
-        var lower = text.toLowerCase();
-        var rev = this.getReverse();
-        Object.keys(rev).forEach(function(key) {
-            if (lower.includes(key)) {
-                rev[key].forEach(function(cn) {
-                    if (results.indexOf(cn) === -1) results.push(cn);
-                });
-            }
-        });
-        return results.length > 0 ? results : [text];
+        var r = [], low = text.toLowerCase(), rev = this.getReverse();
+        Object.keys(rev).forEach(function(k) { if (low.includes(k)) { rev[k].forEach(function(cn) { if (r.indexOf(cn)===-1) r.push(cn); }); } });
+        return r.length > 0 ? r : [text];
     },
-
-    // Get all variants (original + translations) for a keyword
-    getVariants: function(keyword) {
-        var lang = this.detectLanguage(keyword);
-        var variants = new Set();
-        variants.add(keyword);
-        if (lang === 'cn') {
-            this.cnToEn(keyword).forEach(function(t) { variants.add(t); });
-        } else {
-            this.enToCn(keyword).forEach(function(t) { variants.add(t); });
-        }
-        return Array.from(variants);
+    getVariants: function(kw) {
+        var lang = this.detectLang(kw), v = new Set();
+        v.add(kw);
+        if (lang === 'cn') this.cnToEn(kw).forEach(function(t){v.add(t)});
+        else this.enToCn(kw).forEach(function(t){v.add(t)});
+        return Array.from(v);
     }
 };

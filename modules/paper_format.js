@@ -1,17 +1,17 @@
-// paper_format.js - Unified paper data structure
+// 统一论文数据格式
 var PaperFormat = {
-    create: function(data) {
+    create: function(d) {
         return {
-            title: data.title || '',
-            authors: data.authors || [],
-            venue: data.venue || '',
-            year: data.year || 0,
-            abstract: data.abstract || '',
-            citations: data.citations || 0,
-            doi: data.doi || '',
-            url: data.url || '',
-            source: data.source || '',
-            isOpenAccess: data.isOpenAccess || false,
+            title: d.title || '',
+            authors: d.authors || [],
+            venue: d.venue || '',
+            year: d.year || 0,
+            abstract: d.abstract || '',
+            citations: d.citations || 0,
+            doi: d.doi || '',
+            url: d.url || '',
+            source: d.source || '',
+            isOpenAccess: d.isOpenAccess || false,
             isTop: false,
             venueScore: 0
         };
