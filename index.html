@@ -67,11 +67,12 @@ header p{color:rgba(255,255,255,.85);font-size:1.05em}
 .db{background:rgba(102,126,234,.1);border:1px solid rgba(102,126,234,.2);padding:4px 12px;border-radius:16px;font-size:.8em;color:var(--td)}
 .db.ok{background:rgba(72,187,120,.15);border-color:rgba(72,187,120,.3);color:var(--ok)}
 .db.er{background:rgba(252,129,129,.15);border-color:rgba(252,129,129,.3);color:var(--d)}
+.db.wn{background:rgba(237,137,54,.15);border-color:rgba(237,137,54,.3);color:var(--w)}
 .proposal{background:var(--ch);border:1px solid var(--b);border-radius:12px;padding:24px;margin-top:16px;white-space:pre-wrap;font-size:.9em;line-height:1.8}
-.proposal h2,.proposal h3{color:var(--a);margin:16px 0 8px}
 .tab-bar{display:flex;gap:4px;margin-bottom:16px;border-bottom:2px solid var(--b);padding-bottom:0}
 .tab{padding:10px 20px;cursor:pointer;color:var(--td);font-size:.9em;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s}
 .tab.active{color:var(--a);border-bottom-color:var(--a)}
+.err-box{background:rgba(252,129,129,.1);border:1px solid rgba(252,129,129,.3);border-radius:10px;padding:16px;margin-top:12px;color:var(--d);font-size:.9em}
 @media(max-width:768px){.fr,.ag{grid-template-columns:1fr}header h1{font-size:1.6em}.ct{padding:12px}.ag{grid-template-columns:1fr 1fr}}
 </style>
 </head>
@@ -79,16 +80,15 @@ header p{color:rgba(255,255,255,.85);font-size:1.05em}
 
 <header>
 <h1>AI 文献调研助手</h1>
-<p>5数据库 / AND关键词 / 顶刊识别 / 开题报告 / 数据驱动分析</p>
+<p>5数据库 / 智能匹配 / 顶刊识别 / 开题报告 / 数据驱动分析</p>
 </header>
 
 <div class="ct">
 
-<!-- Input -->
 <div class="sec" id="inp">
 <h2>研究方向</h2>
-<div class="fg"><label>研究方向（中文或英文）</label><input type="text" id="dir" placeholder="例如：多智能体系统与大模型协作"></div>
-<div class="fg"><label>关键词（逗号分隔，AND 逻辑匹配）</label><input type="text" id="kw" placeholder="例如：多智能体, 推理, LLM"></div>
+<div class="fg"><label>研究方向（中文或英文，必须匹配）</label><input type="text" id="dir" placeholder="例如：多智能体系统"></div>
+<div class="fg"><label>关键词（逗号分隔，至少匹配一个）</label><input type="text" id="kw" placeholder="例如：LLM, reasoning"></div>
 <div class="fr">
 <div class="fg"><label>学科领域</label><select id="field"><option value="">不限</option><option value="computer science">计算机科学</option><option value="biology">生物学</option><option value="physics">物理学</option><option value="chemistry">化学</option><option value="medicine">医学</option><option value="engineering">工程学</option></select></div>
 <div class="fg"><label>时间范围</label><select id="yr"><option value="">不限</option><option value="3">近3年</option><option value="5" selected>近5年</option><option value="10">近10年</option></select></div>
@@ -96,7 +96,6 @@ header p{color:rgba(255,255,255,.85);font-size:1.05em}
 <button class="btn bp" onclick="doQuery()">生成检索策略</button>
 </div>
 
-<!-- Queries -->
 <div class="sec hid" id="qs">
 <h2>检索策略</h2>
 <div id="qi"></div>
@@ -107,7 +106,6 @@ header p{color:rgba(255,255,255,.85);font-size:1.05em}
 </div>
 </div>
 
-<!-- Progress -->
 <div class="sec hid" id="ps">
 <h2>检索中...</h2>
 <div class="db-list" id="dbst"></div>
@@ -115,43 +113,35 @@ header p{color:rgba(255,255,255,.85);font-size:1.05em}
 <div class="st on" id="smsg">准备中...</div>
 </div>
 
-<!-- Results -->
 <div class="sec hid" id="rs">
 <div class="tab-bar">
-<div class="tab active" onclick="switchTab(this,'papers')">论文列表</div>
-<div class="tab" onclick="switchTab(this,'analysis')">趋势分析</div>
-<div class="tab" onclick="switchTab(this,'proposal')">开题报告</div>
+<div class="tab active" onclick="switchTab(this,\'papers\')">论文列表</div>
+<div class="tab" onclick="switchTab(this,\'analysis\')">趋势分析</div>
+<div class="tab" onclick="switchTab(this,\'proposal\')">开题报告</div>
 </div>
-
-<!-- Papers Tab -->
 <div id="tab-papers">
 <h2>检索结果</h2>
 <div class="fb">
 <span class="rc" id="rc"></span>
 <select id="sort" onchange="doSort()"><option value="top">顶刊优先</option><option value="citations">引用数</option><option value="year">年份</option></select>
 <label style="font-size:.85em;color:var(--td)">最低引用: <span id="cl">0</span></label>
-<input type="range" id="cf" min="0" max="100" value="0" oninput="doFilter()">
+<input type="range" id="cf" min="0" max="200" value="0" oninput="doFilter()">
 <select id="yf" onchange="doFilter()"><option value="0">不限</option><option value="2025">2025+</option><option value="2024">2024+</option><option value="2023">2023+</option><option value="2021">2021+</option></select>
 </div>
 <div id="pl"></div>
 </div>
-
-<!-- Analysis Tab -->
 <div id="tab-analysis" class="hid">
-<h2>趋势分析（基于实际论文数据）</h2>
+<h2>趋势分析</h2>
 <div class="ag" id="sg"></div>
 <div style="margin-top:20px"><h3 style="margin-bottom:10px">研究趋势</h3><ul class="tl" id="tl"></ul></div>
-<div style="margin-top:20px"><h3 style="margin-bottom:10px">研究空白与方向建议</h3><ul class="dl" id="dl"></ul></div>
+<div style="margin-top:20px"><h3 style="margin-bottom:10px">研究空白与方向建议</h3><ul class="dl" id="dll"></ul></div>
 </div>
-
-<!-- Proposal Tab -->
 <div id="tab-proposal" class="hid">
-<h2>开题报告（基于检索论文自动生成）</h2>
-<div id="proposal-content" class="proposal"></div>
+<h2>开题报告</h2>
+<div id="pc" class="proposal"></div>
 </div>
 </div>
 
-<!-- Export -->
 <div class="sec hid" id="es">
 <div class="es">
 <button class="btn bp" onclick="exportReport()">导出文献报告</button>
@@ -177,129 +167,165 @@ header p{color:rgba(255,255,255,.85);font-size:1.05em}
 <script src="modules/dblp_search.js"></script>
 
 <script>
-var S = { dir:'', kw:[], kg:[], queries:[], all:[], filtered:[], proposal:'' };
+var S={dir:'',kw:[],dirVar:[],kg:[],queries:[],all:[],filtered:[],proposal:''};
 
-function switchTab(el, id) {
+function switchTab(el,id){
     document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
     el.classList.add('active');
-    ['papers','analysis','proposal'].forEach(function(t){
-        document.getElementById('tab-'+t).classList.toggle('hid', t!==id);
-    });
+    ['papers','analysis','proposal'].forEach(function(t){document.getElementById('tab-'+t).classList.toggle('hid',t!==id)});
 }
 
-function doQuery() {
-    var dir = document.getElementById('dir').value.trim();
-    var kw = document.getElementById('kw').value.trim();
-    if (!dir || !kw) { alert('请填写研究方向和关键词'); return; }
-    S.dir = dir;
-    var raw = kw.split(/[,，]/).map(function(k){return k.trim()}).filter(Boolean);
-    S.kg = [];
-    var allEn=[], allCn=[];
-    raw.forEach(function(k) {
-        var v = Translator.getVariants(k);
-        S.kg.push(v);
-        v.forEach(function(x) { Translator.detectLang(x)==='en'?allEn.push(x):allCn.push(x); });
-    });
-    var qs = new Set();
-    // English combo
-    var en = S.kg.map(function(g){for(var i=0;i<g.length;i++)if(Translator.detectLang(g[i])==='en')return g[i];return g[0]});
-    qs.add(en.join(' '));
-    // Chinese combo
-    var cn=[];
-    S.kg.forEach(function(g){for(var i=0;i<g.length;i++)if(Translator.detectLang(g[i])==='cn'){cn.push(g[i]);break}});
-    if(cn.length) qs.add(cn.join(' '));
-    // Variant combos
-    S.kg.forEach(function(g,idx){g.forEach(function(v){var p=[];for(var k=0;k<S.kg.length;k++)p.push(k===idx?v:S.kg[k][0]);qs.add(p.join(' '))})});
-    // Direction combos
-    S.kg.forEach(function(g){g.forEach(function(v){qs.add(dir+' '+v)})});
-    S.queries = Array.from(qs).slice(0,15);
-    S.kw = raw;
+function doQuery(){
+    var dir=document.getElementById('dir').value.trim();
+    var kw=document.getElementById('kw').value.trim();
+    if(!dir){alert('请填写研究方向');return}
+    S.dir=dir;
+    // Direction variants
+    S.dirVar=Translator.getVariants(dir);
+    // Keyword groups
+    var raw=kw?kw.split(/[,，]/).map(function(k){return k.trim()}).filter(Boolean):[];
+    S.kg=[];
+    raw.forEach(function(k){S.kg.push(Translator.getVariants(k))});
+    // Generate queries
+    var qs=new Set();
+    // Direction alone
+    S.dirVar.forEach(function(v){qs.add(v)});
+    // Direction + each keyword variant
+    S.kg.forEach(function(g){g.forEach(function(v){S.dirVar.forEach(function(d){qs.add(d+' '+v)})})});
+    // All keywords together
+    if(S.kg.length>0){
+        var en=S.kg.map(function(g){for(var i=0;i<g.length;i++)if(Translator.detectLang(g[i])==='en')return g[i];return g[0]});
+        S.dirVar.forEach(function(d){qs.add(d+' '+en.join(' '))});
+    }
+    S.queries=Array.from(qs).slice(0,12);
+    S.kw=raw;
     // Display
-    var info = '<div style="margin-bottom:8px">';
-    info += '<p style="color:var(--ok);font-size:.85em">语言: '+(allCn.length?'中英混合':'英文')+'</p>';
-    info += '<p style="color:var(--td);font-size:.82em">AND关键词: <strong>'+raw.join(' AND ')+'</strong></p>';
-    if(allEn.length) info += '<p style="color:var(--td);font-size:.82em">英文: '+allEn.join(', ')+'</p>';
-    if(allCn.length) info += '<p style="color:var(--td);font-size:.82em">中文: '+allCn.join(', ')+'</p>';
-    info += '</div>';
-    document.getElementById('qi').innerHTML = info;
-    document.getElementById('ql').innerHTML = S.queries.map(function(q,i){return '<span class="qc">'+(i+1)+'. '+Utils.escapeHtml(q)+'</span>'}).join('');
+    var info='<div style="margin-bottom:8px">';
+    info+='<p style="color:var(--ok);font-size:.85em">匹配规则: 研究方向必须命中 + 关键词至少匹配一个</p>';
+    info+='<p style="color:var(--td);font-size:.82em">方向: <strong>'+S.dirVar.join(' / ')+'</strong></p>';
+    if(raw.length) info+='<p style="color:var(--td);font-size:.82em">关键词: '+raw.join(', ')+'</p>';
+    info+='</div>';
+    document.getElementById('qi').innerHTML=info;
+    document.getElementById('ql').innerHTML=S.queries.map(function(q,i){return '<span class="qc">'+(i+1)+'. '+Utils.escapeHtml(q)+'</span>'}).join('');
     document.getElementById('qs').classList.remove('hid');
     document.getElementById('qs').scrollIntoView({behavior:'smooth'});
 }
 
-async function doSearch() {
-    document.getElementById('bs').disabled = true;
+async function doSearch(){
+    document.getElementById('bs').disabled=true;
     document.getElementById('ps').classList.remove('hid');
     document.getElementById('ps').scrollIntoView({behavior:'smooth'});
-    S.all = [];
-    var fl = document.getElementById('pfl'), msg = document.getElementById('smsg'), dbst = document.getElementById('dbst');
-    var dbs = [
-        {n:'OpenAlex',fn:OpenAlexSearch,w:25},{n:'Semantic Scholar',fn:SemanticSearch,w:25},
-        {n:'arXiv',fn:ArxivSearch,w:17},{n:'Crossref',fn:CrossrefSearch,w:17},{n:'DBLP',fn:DBLPSearch,w:16}
+    S.all=[];
+    var fl=document.getElementById('pfl'),msg=document.getElementById('smsg'),dbst=document.getElementById('dbst');
+
+    var dbs=[
+        {n:'Semantic Scholar',fn:SemanticSearch,w:25},
+        {n:'OpenAlex',fn:OpenAlexSearch,w:25},
+        {n:'arXiv',fn:ArxivSearch,w:17},
+        {n:'Crossref',fn:CrossrefSearch,w:17},
+        {n:'DBLP',fn:DBLPSearch,w:16}
     ];
-    var tp=0, badges=[];
-    for (var i=0;i<dbs.length;i++) {
+
+    var tp=0,badges=[],totalRaw=0;
+
+    for(var i=0;i<dbs.length;i++){
         var d=dbs[i];
         msg.textContent='正在检索 '+d.n+'...';
         badges.push('<span class="db">'+d.n+': 检索中</span>');
         dbst.innerHTML=badges.join('');
-        try {
-            var papers = await d.fn.search(S.queries.slice(0,3).join(' '));
-            var filtered = KeywordFilter.filterPapers(papers, S.kg);
-            S.all.push.apply(S.all, filtered);
+        try{
+            var papers=await d.fn.search(S.queries.slice(0,3).join(' '));
+            totalRaw+=papers.length;
+            var filtered=KeywordFilter.filterPapers(papers,S.dirVar,S.kg.length>0?S.kg:null);
+            S.all.push.apply(S.all,filtered);
             badges[i]='<span class="db ok">'+d.n+': '+papers.length+' -> '+filtered.length+' 篇</span>';
-        } catch(e) {
-            badges[i]='<span class="db er">'+d.n+': 失败</span>';
-            console.error(d.n, e);
+        }catch(e){
+            badges[i]='<span class="db er">'+d.n+': 失败('+e.message+')</span>';
+            console.error('[Search]',d.n,e);
         }
         dbst.innerHTML=badges.join('');
-        tp+=d.w; fl.style.width=tp+'%';
+        tp+=d.w;fl.style.width=tp+'%';
         await Utils.sleep(400);
     }
-    msg.textContent='去重 + 顶刊识别...';
-    fl.style.width='95%';
-    S.all = Utils.deduplicate(S.all).filter(KeywordFilter.hasCompleteMetadata);
+
+    // Dedup
+    msg.textContent='去重处理...';fl.style.width='95%';
+    S.all=Utils.deduplicate(S.all).filter(KeywordFilter.hasMetadata);
     S.all.forEach(function(p){TopVenue.mark(p)});
     S.all.sort(function(a,b){return(b.venueScore+b.citations*0.5+b.year*0.1)-(a.venueScore+a.citations*0.5+a.year*0.1)});
+
+    console.log('[Result] 严格匹配: '+S.all.length+' 篇 (原始获取: '+totalRaw+')');
+
+    // Fallback: if strict filter returns 0, try loose filter
+    if(S.all.length===0 && totalRaw>0){
+        msg.textContent='严格匹配无结果，启动宽松检索...';
+        console.log('[Fallback] 启动宽松过滤');
+        var allVariants=[];
+        S.dirVar.forEach(function(v){allVariants.push(v)});
+        S.kg.forEach(function(g){g.forEach(function(v){allVariants.push(v)})});
+
+        // Re-search with looser queries
+        for(var i=0;i<dbs.length;i++){
+            try{
+                var papers=await dbs[i].fn.search(S.dir);
+                var loose=KeywordFilter.looseFilter(papers,allVariants);
+                S.all.push.apply(S.all,loose);
+                console.log('[Fallback] '+dbs[i].n+': '+loose.length+' 篇');
+            }catch(e){console.error('[Fallback]',dbs[i].n,e)}
+        }
+        S.all=Utils.deduplicate(S.all).filter(KeywordFilter.hasMetadata);
+        S.all.forEach(function(p){TopVenue.mark(p)});
+        S.all.sort(function(a,b){return(b.venueScore+b.citations*0.5+b.year*0.1)-(a.venueScore+a.citations*0.5+a.year*0.1)});
+        if(S.all.length>0){
+            badges.push('<span class="db wn">已放宽匹配条件，找到 '+S.all.length+' 篇</span>');
+            dbst.innerHTML=badges.join('');
+        }
+    }
+
     fl.style.width='100%';
     var tc=S.all.filter(function(p){return p.isTop}).length;
-    msg.textContent='完成！'+S.all.length+'篇论文（'+tc+'篇顶刊），全部满足AND匹配';
-    await Utils.sleep(800);
+
     if(S.all.length>0){
+        msg.textContent='完成！'+S.all.length+'篇论文（'+tc+'篇顶刊）';
+        await Utils.sleep(600);
         document.getElementById('rs').classList.remove('hid');
         document.getElementById('es').classList.remove('hid');
         doFilter();
         renderAnalysis();
         renderProposal();
         document.getElementById('rs').scrollIntoView({behavior:'smooth'});
-    } else {
-        msg.textContent='未找到同时包含所有关键词的论文';
+    }else{
+        msg.textContent='未找到相关论文';
+        // Show error box
+        var errBox=document.createElement('div');
+        errBox.className='err-box';
+        errBox.innerHTML='<strong>检索失败</strong><br>未找到匹配论文。请尝试：<br>1. 使用更通用的研究方向（如"machine learning"）<br>2. 减少关键词数量<br>3. 扩大时间范围<br>4. 使用英文关键词<br><br>可在浏览器按 F12 打开控制台查看详细日志';
+        document.getElementById('ps').appendChild(errBox);
     }
     document.getElementById('bs').disabled=false;
 }
 
-function doFilter() {
+function doFilter(){
     var p=[...S.all];
     var mc=parseInt(document.getElementById('cf').value);
     document.getElementById('cl').textContent=mc;
     p=p.filter(function(x){return x.citations>=mc});
     var yt=parseInt(document.getElementById('yf').value);
     if(yt>0) p=p.filter(function(x){return x.year>=yt});
-    S.filtered=p;
-    doSort();
+    S.filtered=p;doSort();
 }
 
-function doSort() {
-    var by=document.getElementById('sort').value, p=[...S.filtered];
-    if(by==='citations') p.sort(function(a,b){return b.citations-a.citations});
-    else if(by==='year') p.sort(function(a,b){return b.year-a.year});
+function doSort(){
+    var by=document.getElementById('sort').value,p=[...S.filtered];
+    if(by==='citations')p.sort(function(a,b){return b.citations-a.citations});
+    else if(by==='year')p.sort(function(a,b){return b.year-a.year});
     else p.sort(function(a,b){return(b.venueScore+b.citations*0.5+(b.year>=2024?10:b.year>=2022?5:0))-(a.venueScore+a.citations*0.5+(a.year>=2024?10:a.year>=2022?5:0))});
     renderPapers(p.slice(0,50));
     var tc=p.filter(function(x){return x.isTop}).length;
     document.getElementById('rc').textContent='共 '+p.length+' 篇（'+tc+'篇顶刊）';
 }
 
-function renderPapers(papers) {
+function renderPapers(papers){
     document.getElementById('pl').innerHTML=papers.map(function(p,i){
         var a=p.authors.slice(0,3).join(', ')+(p.authors.length>3?' et al.':'');
         var v=p.isTop?'<span class="bdg top">'+Utils.escapeHtml(p.venue)+' TOP</span>':(p.venue?'<span class="bdg">'+Utils.escapeHtml(p.venue)+'</span>':'');
@@ -317,56 +343,53 @@ function renderPapers(papers) {
     }).join('');
 }
 
-function renderAnalysis() {
-    var p=S.filtered.length>5?S.filtered:S.all;
-    var cs=TrendAnalysis.citeStats(p), ts=TrendAnalysis.topStats(p), yd=TrendAnalysis.yearDist(p);
+function renderAnalysis(){
+    var p=S.filtered.length>3?S.filtered:S.all;
+    if(!p.length)return;
+    var cs=TrendAnalysis.citeStats(p),ts=TrendAnalysis.topStats(p);
     document.getElementById('sg').innerHTML=''
-        +'<div class="sc"><div class="n">'+p.length+'</div><div class="label">论文(AND)</div></div>'
+        +'<div class="sc"><div class="n">'+p.length+'</div><div class="label">论文数</div></div>'
         +'<div class="sc"><div class="n">'+cs.total.toLocaleString()+'</div><div class="label">总引用</div></div>'
         +'<div class="sc"><div class="n">'+cs.avg+'</div><div class="label">平均引用</div></div>'
         +'<div class="sc"><div class="n">'+ts.count+'</div><div class="label">顶刊</div></div>';
     document.getElementById('tl').innerHTML=TrendAnalysis.summary(p).map(function(t){return'<li>'+Utils.escapeHtml(t)+'</li>'}).join('');
-    document.getElementById('dl').innerHTML=ResearchGap.findGaps(p,S.kg).map(function(d){return'<li>'+Utils.escapeHtml(d)+'</li>'}).join('');
+    document.getElementById('dll').innerHTML=ResearchGap.findGaps(p,S.kg).map(function(d){return'<li>'+Utils.escapeHtml(d)+'</li>'}).join('');
 }
 
-function renderProposal() {
+function renderProposal(){
     var p=S.filtered.length>3?S.filtered:S.all;
-    S.proposal=ProposalGenerator.generate(p, S.dir, S.kw, S.kg);
-    // Render as HTML
-    var NL = String.fromCharCode(10);
-    var html = S.proposal
-        .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-        .replace(/^\*\*(.+?)\*\*/gm, '<strong>$1</strong>')
-        .replace(/^- (.+)$/gm, '<li>$1</li>')
-        .split(NL + NL).join('<br><br>')
+    if(!p.length)return;
+    S.proposal=ProposalGenerator.generate(p,S.dir,S.kw,S.kg);
+    var NL=String.fromCharCode(10);
+    var html=S.proposal
+        .replace(/^## (.+)$/gm,'<h2>$1</h2>')
+        .replace(/^\*\*(.+?)\*\*/gm,'<strong>$1</strong>')
+        .replace(/^- (.+)$/gm,'<li>$1</li>')
+        .split(NL+NL).join('<br><br>')
         .split(NL).join('<br>');
-    document.getElementById('proposal-content').innerHTML=html;
+    document.getElementById('pc').innerHTML=html;
 }
 
-// Exports
-function exportReport() {
+function exportReport(){
     var p=S.filtered.length?S.filtered:S.all;
     var tp=[...p].sort(function(a,b){return b.citations-a.citations}).slice(0,15);
-    var lines=['# 文献调研报告','','## 研究方向: '+S.dir,'','## 关键词(AND): '+S.kw.join(' AND '),'','## 检索策略'];
+    var lines=['# 文献调研报告','','## 研究方向: '+S.dir,'','## 关键词: '+S.kw.join(', '),'','## 匹配规则: 方向必须匹配 + 关键词至少匹配一个','','## 检索策略'];
     S.queries.forEach(function(q){lines.push('- '+q)});
     var tc=p.filter(function(x){return x.isTop}).length;
     lines.push('','## 检索结果: '+p.length+'篇, 顶刊: '+tc+'篇','','## 代表性论文','');
-    tp.forEach(function(p,i){lines.push('### '+(i+1)+'. '+p.title,'- 作者: '+p.authors.join(', '),'- 期刊: '+(p.venue||'未知')+(p.isTop?' [顶刊]':''),'- 年份: '+p.year+', 引用: '+p.citations+', 来源: '+p.source,'- 摘要: '+(p.abstract||'无'),'')});
+    tp.forEach(function(p,i){lines.push('### '+(i+1)+'. '+p.title,'- 作者: '+p.authors.join(', '),'- 期刊: '+(p.venue||'未知')+(p.isTop?' [顶刊]':''),'- 年份: '+p.year+', 引用: '+p.citations,'- 摘要: '+(p.abstract||'无'),'')});
     lines.push('## 趋势','');document.querySelectorAll('#tl li').forEach(function(li){lines.push('- '+li.textContent)});
-    lines.push('','## 方向建议','');document.querySelectorAll('#dl li').forEach(function(li){lines.push('- '+li.textContent)});
+    lines.push('','## 方向建议','');document.querySelectorAll('#dll li').forEach(function(li){lines.push('- '+li.textContent)});
     lines.push('','---','*AI 文献调研助手*');
     Utils.downloadFile(lines.join('\n'),'文献调研报告.md','text/markdown');
 }
 
-function exportProposal() {
-    Utils.downloadFile(S.proposal, '开题报告.md', 'text/markdown');
-}
+function exportProposal(){Utils.downloadFile(S.proposal,'开题报告.md','text/markdown')}
 
-function exportJSON() {
+function exportJSON(){
     var p=S.filtered.length?S.filtered:S.all;
     Utils.downloadFile(JSON.stringify({direction:S.dir,keywords:S.kw,queries:S.queries,total:p.length,papers:p,proposal:S.proposal},null,2),'调研数据.json','application/json');
 }
 </script>
-
 </body>
 </html>

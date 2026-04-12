@@ -2,12 +2,16 @@ var CrossrefSearch = {
     name: 'Crossref',
     search: async function(query) {
         var papers = [];
+        console.log('[Crossref] 查询:', query);
         try {
             var url = 'https://api.crossref.org/works?query=' + encodeURIComponent(query) + '&rows=25&sort=relevance';
-            var yr = document.getElementById('yearRange').value;
+            var yr = document.getElementById('yr').value;
             if (yr) url += '&filter=from-pub-date:' + (new Date().getFullYear()-parseInt(yr));
-            var res = await fetch(url, {headers:{'User-Agent':'LitAssistant/1.0'}});
+            console.log('[Crossref] URL:', url);
+            var res = await fetch(url, {headers:{'User-Agent':'LitAssistant/1.0 (mailto:test@test.com)'}});
+            console.log('[Crossref] 状态:', res.status);
             var data = await res.json();
+            console.log('[Crossref] 返回:', (data.message&&data.message.items)?data.message.items.length:0, '条');
             if (data.message&&data.message.items) data.message.items.forEach(function(p) {
                 var t=(p.title&&p.title[0])||''; if(!t) return;
                 var a=(p.author||[]).slice(0,5).map(function(x){return ((x.given||'')+' '+(x.family||'')).trim()});
@@ -18,7 +22,8 @@ var CrossrefSearch = {
                 else if(p.created&&p.created['date-parts']&&p.created['date-parts'][0]) y=p.created['date-parts'][0][0]||0;
                 papers.push(PaperFormat.create({title:t,authors:a,venue:v,year:y,abstract:(p.abstract||'').replace(/<[^>]*>/g,'').trim(),citations:p['is-referenced-by-count']||0,doi:p.DOI||'',url:p.URL||(p.DOI?'https://doi.org/'+p.DOI:''),source:'Crossref'}));
             });
-        } catch(e) { console.error('Crossref:', e); }
+        } catch(e) { console.error('[Crossref] 错误:', e); }
+        console.log('[Crossref] 解析后 ' + papers.length + ' 篇');
         return papers;
     }
 };
