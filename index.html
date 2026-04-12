@@ -6,18 +6,18 @@
 <title>AI 文献调研助手</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--primary:#667eea;--primary-dark:#5a67d8;--secondary:#764ba2;--bg:#0f0f1a;--card:#1a1a2e;--card-hover:#222240;--border:#2a2a4a;--text:#e2e8f0;--text-dim:#94a3b8;--accent:#667eea;--success:#48bb78;--warning:#ed8936;--danger:#fc8181}
+:root{--primary:#667eea;--secondary:#764ba2;--bg:#0f0f1a;--card:#1a1a2e;--card-hover:#222240;--border:#2a2a4a;--text:#e2e8f0;--text-dim:#94a3b8;--accent:#667eea;--success:#48bb78;--warning:#ed8936;--danger:#fc8181}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
 .container{max-width:1200px;margin:0 auto;padding:20px}
 header{text-align:center;padding:40px 20px 30px;background:linear-gradient(135deg,var(--primary),var(--secondary));border-radius:0 0 20px 20px;margin-bottom:30px}
-header h1{font-size:2.2em;font-weight:700;margin-bottom:8px;letter-spacing:1px}
+header h1{font-size:2.2em;font-weight:700;margin-bottom:8px}
 header p{color:rgba(255,255,255,.85);font-size:1.1em}
 .section{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:24px}
-.section h2{font-size:1.3em;margin-bottom:16px;color:var(--accent);display:flex;align-items:center;gap:8px}
+.section h2{font-size:1.3em;margin-bottom:16px;color:var(--accent)}
 .form-group{margin-bottom:16px}
 .form-group label{display:block;margin-bottom:6px;color:var(--text-dim);font-size:.9em;font-weight:500}
-.form-group input,.form-group select,.form-group textarea{width:100%;padding:12px 16px;background:#12121f;border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:1em;transition:border-color .2s}
-.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--accent)}
+.form-group input,.form-group select{width:100%;padding:12px 16px;background:#12121f;border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:1em;transition:border-color .2s}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--accent)}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .tag{background:rgba(102,126,234,.15);border:1px solid rgba(102,126,234,.3);padding:6px 14px;border-radius:20px;font-size:.85em;cursor:pointer;transition:all .2s}
@@ -25,7 +25,7 @@ header p{color:rgba(255,255,255,.85);font-size:1.1em}
 .btn{padding:12px 28px;border:none;border-radius:10px;font-size:1em;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
 .btn-primary{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff}
 .btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 15px rgba(102,126,234,.4)}
-.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none}
 .btn-secondary{background:var(--card-hover);color:var(--text);border:1px solid var(--border)}
 .btn-secondary:hover{border-color:var(--accent)}
 .btn-group{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
@@ -45,8 +45,9 @@ header p{color:rgba(255,255,255,.85);font-size:1.1em}
 .paper-card h3{font-size:1.05em;margin-bottom:8px;color:#fff;line-height:1.4}
 .paper-meta{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:10px;font-size:.82em;color:var(--text-dim)}
 .paper-meta span{display:flex;align-items:center;gap:4px}
-.paper-meta .badge{background:rgba(102,126,234,.2);color:var(--accent);padding:2px 8px;border-radius:10px;font-size:.85em}
-.paper-meta .citations{background:rgba(72,187,120,.15);color:var(--success);padding:2px 8px;border-radius:10px}
+.badge{background:rgba(102,126,234,.2);color:var(--accent);padding:2px 8px;border-radius:10px;font-size:.85em}
+.badge.top{background:rgba(237,137,54,.25);color:var(--warning)}
+.citations{background:rgba(72,187,120,.15);color:var(--success);padding:2px 8px;border-radius:10px}
 .paper-abstract{color:var(--text-dim);font-size:.88em;line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .paper-card.expanded .paper-abstract{-webkit-line-clamp:unset}
 .paper-actions{display:flex;gap:8px;margin-top:12px}
@@ -59,10 +60,14 @@ header p{color:rgba(255,255,255,.85);font-size:1.1em}
 .trend-list,.direction-list{list-style:none;padding:0}
 .trend-list li,.direction-list li{padding:10px 0;border-bottom:1px solid var(--border);font-size:.9em}
 .trend-list li:last-child,.direction-list li:last-child{border-bottom:none}
-.trend-list li::before{content:"\1F4C8 ";margin-right:6px}
-.direction-list li::before{content:"\1F4A1 ";margin-right:6px}
+.trend-list li::before{content:"\1F4C8 "}
+.direction-list li::before{content:"\1F4A1 "}
 .hidden{display:none}
 .export-section{text-align:center;padding:20px}
+.db-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.db-badge{background:rgba(102,126,234,.1);border:1px solid rgba(102,126,234,.2);padding:4px 12px;border-radius:16px;font-size:.8em;color:var(--text-dim)}
+.db-badge.ok{background:rgba(72,187,120,.15);border-color:rgba(72,187,120,.3);color:var(--success)}
+.db-badge.err{background:rgba(252,129,129,.15);border-color:rgba(252,129,129,.3);color:var(--danger)}
 @media(max-width:768px){.form-row,.analysis-grid{grid-template-columns:1fr}header h1{font-size:1.6em}.container{padding:12px}}
 </style>
 </head>
@@ -70,25 +75,25 @@ header p{color:rgba(255,255,255,.85);font-size:1.1em}
 
 <header>
 <h1>AI 文献调研助手</h1>
-<p>多源检索 / 智能筛选 / 趋势分析 - 高精度跨学科文献调研</p>
+<p>6数据库检索 / AND关键词匹配 / 顶刊识别 / 数据驱动分析</p>
 </header>
 
 <div class="container">
 
-<!-- Step 1: Input -->
+<!-- Input -->
 <div class="section" id="input-section">
 <h2>研究方向</h2>
 <div class="form-group">
-<label>研究方向（必填）</label>
+<label>研究方向（中文或英文）</label>
 <input type="text" id="direction" placeholder="例如：多智能体系统与大模型协作">
 </div>
 <div class="form-group">
-<label>关键词（必填，用逗号分隔）</label>
-<input type="text" id="keywords" placeholder="例如：Multi-Agent, LLM, reasoning">
+<label>关键词（中文或英文，逗号分隔，AND逻辑）</label>
+<input type="text" id="keywords" placeholder="例如：多智能体, 推理, LLM">
 </div>
 <div class="form-row">
 <div class="form-group">
-<label>学科领域（可选）</label>
+<label>学科领域</label>
 <select id="field">
 <option value="">不限</option>
 <option value="computer science">计算机科学</option>
@@ -97,18 +102,14 @@ header p{color:rgba(255,255,255,.85);font-size:1.1em}
 <option value="chemistry">化学</option>
 <option value="medicine">医学</option>
 <option value="engineering">工程学</option>
-<option value="mathematics">数学</option>
-<option value="economics">经济学</option>
-<option value="psychology">心理学</option>
-<option value="environmental science">环境科学</option>
 </select>
 </div>
 <div class="form-group">
 <label>时间范围</label>
 <select id="yearRange">
 <option value="">不限</option>
-<option value="3">近3年（2023-2025）</option>
-<option value="5" selected>近5年（2021-2025）</option>
+<option value="3">近3年</option>
+<option value="5" selected>近5年</option>
 <option value="10">近10年</option>
 </select>
 </div>
@@ -121,40 +122,39 @@ header p{color:rgba(255,255,255,.85);font-size:1.1em}
 <span class="tag active" data-val="recent">最新优先</span>
 </div>
 </div>
-<div class="btn-group">
-<button class="btn btn-primary" id="btn-generate" onclick="generateQueries()">生成检索策略</button>
-</div>
+<button class="btn btn-primary" onclick="step1_generateQueries()">生成检索策略</button>
 </div>
 
-<!-- Step 2: Queries -->
+<!-- Queries -->
 <div class="section hidden" id="query-section">
 <h2>检索策略</h2>
-<p style="color:var(--text-dim);font-size:.9em;margin-bottom:8px">根据研究方向自动生成的检索查询组合：</p>
+<div id="query-info"></div>
 <div class="queries" id="query-list"></div>
 <div class="btn-group" style="margin-top:16px">
-<button class="btn btn-primary" id="btn-search" onclick="startSearch()">开始多源检索</button>
-<button class="btn btn-secondary" onclick="regenerateQueries()">重新生成</button>
+<button class="btn btn-primary" id="btn-search" onclick="step2_startSearch()">6数据库检索</button>
+<button class="btn btn-secondary" onclick="step1_generateQueries()">重新生成</button>
 </div>
 </div>
 
-<!-- Step 3: Progress -->
+<!-- Progress -->
 <div class="section hidden" id="progress-section">
 <h2>检索中...</h2>
+<div class="db-list" id="db-status"></div>
 <div class="progress-bar active"><div class="progress-fill" id="progress-fill"></div></div>
 <div class="status active" id="search-status">准备中...</div>
 </div>
 
-<!-- Step 4: Results -->
+<!-- Results -->
 <div class="section hidden" id="results-section">
 <h2>检索结果</h2>
 <div class="filter-bar">
 <span class="results-count" id="results-count"></span>
 <select id="sort-by" onchange="sortResults()">
+<option value="relevance">按综合排序</option>
 <option value="citations">按引用数排序</option>
 <option value="year">按年份排序</option>
-<option value="relevance">按相关度排序</option>
 </select>
-<label style="font-size:.85em;color:var(--text-dim)">最低引用数: <span id="cite-label">0</span></label>
+<label style="font-size:.85em;color:var(--text-dim)">最低引用: <span id="cite-label">0</span></label>
 <input type="range" id="cite-filter" min="0" max="100" value="0" oninput="filterResults()">
 <select id="year-filter" onchange="filterResults()">
 <option value="0">不限年份</option>
@@ -167,16 +167,16 @@ header p{color:rgba(255,255,255,.85);font-size:1.1em}
 <div id="paper-list"></div>
 </div>
 
-<!-- Step 5: Analysis -->
+<!-- Analysis -->
 <div class="section hidden" id="analysis-section">
-<h2>智能分析报告</h2>
+<h2>分析报告（基于实际数据）</h2>
 <div class="analysis-grid" id="stats-grid"></div>
 <div style="margin-top:20px">
-<h3 style="margin-bottom:10px">研究趋势分析</h3>
+<h3 style="margin-bottom:10px">研究趋势</h3>
 <ul class="trend-list" id="trend-list"></ul>
 </div>
 <div style="margin-top:20px">
-<h3 style="margin-bottom:10px">推荐研究方向</h3>
+<h3 style="margin-bottom:10px">研究方向建议</h3>
 <ul class="direction-list" id="direction-list"></ul>
 </div>
 </div>
@@ -185,13 +185,280 @@ header p{color:rgba(255,255,255,.85);font-size:1.1em}
 <div class="section hidden" id="export-section">
 <div class="export-section">
 <button class="btn btn-primary" onclick="exportReport()">导出文献调研报告</button>
-<button class="btn btn-secondary" onclick="exportJSON()">导出 JSON 数据</button>
+<button class="btn btn-secondary" onclick="exportJSON()">导出 JSON</button>
 </div>
 </div>
 
 </div>
 
-<script src="app.js"></script>
+<!-- Load modules -->
+<script src="modules/paper_format.js"></script>
+<script src="modules/utils.js"></script>
+<script src="modules/translator.js"></script>
+<script src="modules/keyword_filter.js"></script>
+<script src="modules/top_venue.js"></script>
+<script src="modules/trend_analysis.js"></script>
+<script src="modules/research_gap.js"></script>
+<script src="modules/openalex_search.js"></script>
+<script src="modules/semantic_search.js"></script>
+<script src="modules/crossref_search.js"></script>
+<script src="modules/arxiv_search.js"></script>
+<script src="modules/dblp_search.js"></script>
+
+<script>
+// ==================== Main App ====================
+var app = {
+    direction: '',
+    keywords: [],
+    keywordGroups: [], // array of arrays (variants per keyword)
+    queries: [],
+    allPapers: [],
+    filteredPapers: []
+};
+
+// ==================== Step 1: Generate Queries ====================
+function step1_generateQueries() {
+    var dir = document.getElementById('direction').value.trim();
+    var kw = document.getElementById('keywords').value.trim();
+    if (!dir || !kw) { alert('请填写研究方向和关键词'); return; }
+
+    app.direction = dir;
+    var rawKw = kw.split(/[,，]/).map(function(k) { return k.trim(); }).filter(Boolean);
+
+    // Get variants for each keyword
+    app.keywordGroups = [];
+    var allEn = [], allCn = [];
+    rawKw.forEach(function(k) {
+        var variants = Translator.getVariants(k);
+        app.keywordGroups.push(variants);
+        variants.forEach(function(v) {
+            if (Translator.detectLanguage(v) === 'en') allEn.push(v);
+            else allCn.push(v);
+        });
+    });
+
+    // Generate queries
+    var queries = new Set();
+    // English primary combination
+    var enPrimary = app.keywordGroups.map(function(g) {
+        for (var i = 0; i < g.length; i++) { if (Translator.detectLanguage(g[i]) === 'en') return g[i]; }
+        return g[0];
+    });
+    queries.add(enPrimary.join(' '));
+    // Chinese combination
+    var cnParts = [];
+    app.keywordGroups.forEach(function(g) {
+        for (var i = 0; i < g.length; i++) { if (Translator.detectLanguage(g[i]) === 'cn') { cnParts.push(g[i]); break; } }
+    });
+    if (cnParts.length > 0) queries.add(cnParts.join(' '));
+    // Variant combos
+    app.keywordGroups.forEach(function(g, idx) {
+        g.forEach(function(v) {
+            var parts = [];
+            for (var k = 0; k < app.keywordGroups.length; k++) parts.push(k === idx ? v : app.keywordGroups[k][0]);
+            queries.add(parts.join(' '));
+        });
+    });
+    // Direction + each variant
+    app.keywordGroups.forEach(function(g) {
+        g.forEach(function(v) { queries.add(dir + ' ' + v); });
+    });
+
+    app.queries = Array.from(queries).slice(0, 15);
+    app.keywords = rawKw;
+
+    // Display
+    var info = '<div style="margin-bottom:12px">';
+    info += '<p style="color:var(--success);font-size:.85em">检测语言: ' + (allCn.length > 0 ? '中英混合' : '英文') + '</p>';
+    info += '<p style="color:var(--text-dim);font-size:.82em">核心关键词(AND): <strong>' + rawKw.join(' AND ') + '</strong></p>';
+    if (allEn.length > 0) info += '<p style="color:var(--text-dim);font-size:.82em">英文: ' + allEn.join(', ') + '</p>';
+    if (allCn.length > 0) info += '<p style="color:var(--text-dim);font-size:.82em">中文: ' + allCn.join(', ') + '</p>';
+    info += '</div>';
+    document.getElementById('query-info').innerHTML = info;
+
+    var list = document.getElementById('query-list');
+    list.innerHTML = app.queries.map(function(q, i) {
+        return '<span class="query-chip">' + (i + 1) + '. ' + Utils.escapeHtml(q) + '</span>';
+    }).join('');
+
+    document.getElementById('query-section').classList.remove('hidden');
+    document.getElementById('query-section').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ==================== Step 2: Multi-Database Search ====================
+async function step2_startSearch() {
+    document.getElementById('btn-search').disabled = true;
+    document.getElementById('progress-section').classList.remove('hidden');
+    document.getElementById('progress-section').scrollIntoView({ behavior: 'smooth' });
+
+    app.allPapers = [];
+    var progress = document.getElementById('progress-fill');
+    var status = document.getElementById('search-status');
+    var dbStatus = document.getElementById('db-status');
+
+    var sources = [
+        { name: 'OpenAlex', fn: OpenAlexSearch, weight: 20 },
+        { name: 'Semantic Scholar', fn: SemanticSearch, weight: 20 },
+        { name: 'arXiv', fn: ArxivSearch, weight: 15 },
+        { name: 'Crossref', fn: CrossrefSearch, weight: 15 },
+        { name: 'DBLP', fn: DBLPSearch, weight: 15 }
+    ];
+
+    var totalProgress = 0;
+    var dbBadges = [];
+
+    for (var si = 0; si < sources.length; si++) {
+        var src = sources[si];
+        status.textContent = '正在检索 ' + src.name + '...';
+        dbBadges.push('<span class="db-badge">' + src.name + ': 检索中...</span>');
+        dbStatus.innerHTML = dbBadges.join('');
+
+        try {
+            var papers = await src.fn.searchPapers(app.queries.slice(0, 3).join(' '), 30);
+            var filtered = KeywordFilter.filterPapers(papers, app.keywordGroups);
+            app.allPapers.push(...filtered);
+            dbBadges[si] = '<span class="db-badge ok">' + src.name + ': ' + papers.length + ' -> ' + filtered.length + ' 篇</span>';
+        } catch (e) {
+            dbBadges[si] = '<span class="db-badge err">' + src.name + ': 失败</span>';
+            console.error(src.name + ':', e);
+        }
+        dbStatus.innerHTML = dbBadges.join('');
+        totalProgress += src.weight;
+        progress.style.width = totalProgress + '%';
+        await Utils.sleep(400);
+    }
+
+    status.textContent = '去重 + 顶刊识别中...';
+    progress.style.width = '95%';
+    app.allPapers = Utils.deduplicate(app.allPapers);
+    // Metadata validation
+    app.allPapers = app.allPapers.filter(KeywordFilter.hasCompleteMetadata);
+    // Venue scoring
+    app.allPapers.forEach(function(p) { TopVenue.scoreAndMark(p); });
+    // Sort by venue score + citations
+    app.allPapers.sort(function(a, b) {
+        return (b.venueScore + b.citations * 0.5 + b.year * 0.1) - (a.venueScore + a.citations * 0.5 + a.year * 0.1);
+    });
+
+    progress.style.width = '100%';
+    var topCount = app.allPapers.filter(function(p) { return p.isTop; }).length;
+    status.textContent = '完成！' + app.allPapers.length + ' 篇论文（含 ' + topCount + ' 篇顶刊），全部满足AND关键词匹配';
+    await Utils.sleep(800);
+
+    if (app.allPapers.length > 0) {
+        document.getElementById('results-section').classList.remove('hidden');
+        document.getElementById('analysis-section').classList.remove('hidden');
+        document.getElementById('export-section').classList.remove('hidden');
+        filterResults();
+        renderAnalysis();
+        document.getElementById('results-section').scrollIntoView({ behavior: 'smooth' });
+    } else {
+        status.textContent = '未找到同时包含所有关键词的论文，请减少关键词数量或调整表述';
+    }
+    document.getElementById('btn-search').disabled = false;
+}
+
+// ==================== Filter & Sort ====================
+function filterResults() {
+    var papers = [...app.allPapers];
+    var minCite = parseInt(document.getElementById('cite-filter').value);
+    document.getElementById('cite-label').textContent = minCite;
+    papers = papers.filter(function(p) { return p.citations >= minCite; });
+    var yt = parseInt(document.getElementById('year-filter').value);
+    if (yt > 0) papers = papers.filter(function(p) { return p.year >= yt; });
+    app.filteredPapers = papers;
+    sortResults();
+}
+
+function sortResults() {
+    var sortBy = document.getElementById('sort-by').value;
+    var papers = [...app.filteredPapers];
+    switch (sortBy) {
+        case 'citations': papers.sort(function(a, b) { return b.citations - a.citations; }); break;
+        case 'year': papers.sort(function(a, b) { return b.year - a.year; }); break;
+        case 'relevance': papers.sort(function(a, b) {
+            return (b.venueScore + b.citations * 0.5 + (b.year >= 2024 ? 10 : b.year >= 2022 ? 5 : 0)) - (a.venueScore + a.citations * 0.5 + (a.year >= 2024 ? 10 : a.year >= 2022 ? 5 : 0));
+        }); break;
+    }
+    renderPapers(papers.slice(0, 50));
+    var tc = papers.filter(function(p) { return p.isTop; }).length;
+    document.getElementById('results-count').textContent = '共 ' + papers.length + ' 篇（含 ' + tc + ' 篇顶刊）';
+}
+
+function renderPapers(papers) {
+    document.getElementById('paper-list').innerHTML = papers.map(function(p, i) {
+        var aStr = p.authors.slice(0, 3).join(', ') + (p.authors.length > 3 ? ' et al.' : '');
+        var vBadge = p.isTop ? '<span class="badge top">' + Utils.escapeHtml(p.venue) + ' TOP</span>' : (p.venue ? '<span class="badge">' + Utils.escapeHtml(p.venue) + '</span>' : '');
+        return '<div class="paper-card" onclick="this.classList.toggle('expanded')">'
+            + '<h3>' + (i+1) + '. ' + Utils.escapeHtml(p.title) + '</h3>'
+            + '<div class="paper-meta"><span>' + Utils.escapeHtml(aStr) + '</span>' + vBadge
+            + '<span>' + p.year + '</span><span class="citations">' + p.citations + ' 引用</span>'
+            + '<span class="badge">' + p.source + '</span>'
+            + (p.isOpenAccess ? '<span style="color:var(--success)">OA</span>' : '')
+            + '</div><div class="paper-abstract">' + Utils.escapeHtml(p.abstract || '无摘要') + '</div>'
+            + '<div class="paper-actions">'
+            + (p.url ? '<a href="' + p.url + '" target="_blank" onclick="event.stopPropagation()">查看论文</a>' : '')
+            + (p.doi ? '<a href="https://doi.org/' + p.doi + '" target="_blank" onclick="event.stopPropagation()">DOI</a>' : '')
+            + '</div></div>';
+    }).join('');
+}
+
+// ==================== Analysis ====================
+function renderAnalysis() {
+    var papers = app.filteredPapers.length > 5 ? app.filteredPapers : app.allPapers;
+
+    // Stats
+    var citeStats = TrendAnalysis.getCitationStats(papers);
+    var topStats = TrendAnalysis.getTopVenueStats(papers);
+    var yDist = TrendAnalysis.getYearDistribution(papers);
+    var years = yDist.years;
+    document.getElementById('stats-grid').innerHTML = ''
+        + '<div class="stat-card"><div class="num">' + papers.length + '</div><div class="label">论文总数(AND)</div></div>'
+        + '<div class="stat-card"><div class="num">' + citeStats.total.toLocaleString() + '</div><div class="label">总引用数</div></div>'
+        + '<div class="stat-card"><div class="num">' + citeStats.average + '</div><div class="label">平均引用</div></div>'
+        + '<div class="stat-card"><div class="num">' + topStats.count + '</div><div class="label">顶刊论文</div></div>';
+
+    // Trends
+    var trendLines = TrendAnalysis.generateSummary(papers);
+    document.getElementById('trend-list').innerHTML = trendLines.map(function(t) { return '<li>' + Utils.escapeHtml(t) + '</li>'; }).join('');
+
+    // Research gaps
+    var gapLines = ResearchGap.generateRecommendations(papers, app.keywordGroups);
+    document.getElementById('direction-list').innerHTML = gapLines.map(function(d) { return '<li>' + Utils.escapeHtml(d) + '</li>'; }).join('');
+}
+
+// ==================== Export ====================
+function exportReport() {
+    var papers = app.filteredPapers.length > 0 ? app.filteredPapers : app.allPapers;
+    var topPapers = [...papers].sort(function(a, b) { return b.citations - a.citations; }).slice(0, 15);
+    var lines = ['# 文献调研报告', '', '## 研究方向: ' + app.direction, '',
+        '## 关键词(AND): ' + app.keywords.join(' AND '), '',
+        '## 检索策略 (' + app.queries.length + ' 个查询, 5个数据库)'];
+    app.queries.forEach(function(q) { lines.push('- ' + q); });
+    var topC = papers.filter(function(p) { return p.isTop; }).length;
+    lines.push('', '## 检索结果: ' + papers.length + ' 篇, 顶刊: ' + topC + ' 篇', '', '## 代表性论文', '');
+    topPapers.forEach(function(p, i) {
+        lines.push('### ' + (i+1) + '. ' + p.title);
+        lines.push('- 作者: ' + p.authors.join(', '));
+        lines.push('- 期刊: ' + (p.venue || '未知') + (p.isTop ? ' [顶刊]' : ''));
+        lines.push('- 年份: ' + p.year + ', 引用: ' + p.citations + ', 来源: ' + p.source);
+        if (p.doi) lines.push('- DOI: ' + p.doi);
+        lines.push('- 摘要: ' + (p.abstract || '无'));
+        lines.push('');
+    });
+    lines.push('## 研究趋势（实际数据）');
+    document.querySelectorAll('#trend-list li').forEach(function(li) { lines.push('- ' + li.textContent); });
+    lines.push('', '## 研究方向建议');
+    document.querySelectorAll('#direction-list li').forEach(function(li) { lines.push('- ' + li.textContent); });
+    lines.push('', '---', '*AI 文献调研助手 - 所有数据基于实际检索*');
+    Utils.downloadFile(lines.join('\n'), '文献调研报告.md', 'text/markdown');
+}
+
+function exportJSON() {
+    var papers = app.filteredPapers.length > 0 ? app.filteredPapers : app.allPapers;
+    Utils.downloadFile(JSON.stringify({ direction: app.direction, keywords: app.keywords, queries: app.queries, total: papers.length, papers: papers }, null, 2), '文献调研数据.json', 'application/json');
+}
+</script>
 
 </body>
 </html>
