@@ -389,7 +389,7 @@ function renderPapers(papers) {
     document.getElementById('paper-list').innerHTML = papers.map(function(p, i) {
         var aStr = p.authors.slice(0, 3).join(', ') + (p.authors.length > 3 ? ' et al.' : '');
         var vBadge = p.isTop ? '<span class="badge top">' + Utils.escapeHtml(p.venue) + ' TOP</span>' : (p.venue ? '<span class="badge">' + Utils.escapeHtml(p.venue) + '</span>' : '');
-        return '<div class="paper-card" onclick="this.classList.toggle('expanded')">'
+        return '<div class="paper-card" onclick="this.classList.toggle(\'expanded\')">'
             + '<h3>' + (i+1) + '. ' + Utils.escapeHtml(p.title) + '</h3>'
             + '<div class="paper-meta"><span>' + Utils.escapeHtml(aStr) + '</span>' + vBadge
             + '<span>' + p.year + '</span><span class="citations">' + p.citations + ' 引用</span>'
