@@ -56,17 +56,12 @@ header p{color:rgba(255,255,255,.85);font-size:1.1em}
 .stat-card{background:var(--card-hover);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center}
 .stat-card .num{font-size:2em;font-weight:700;color:var(--accent)}
 .stat-card .label{color:var(--text-dim);font-size:.85em;margin-top:4px}
-.trend-list{list-style:none;padding:0}
-.trend-list li{padding:10px 0;border-bottom:1px solid var(--border);font-size:.9em}
-.trend-list li:last-child{border-bottom:none}
-.trend-list li::before{content:"📈 ";margin-right:6px}
-.direction-list{list-style:none;padding:0}
-.direction-list li{padding:10px 0;border-bottom:1px solid var(--border);font-size:.9em}
-.direction-list li:last-child{border-bottom:none}
-.direction-list li::before{content:"💡 ";margin-right:6px}
+.trend-list,.direction-list{list-style:none;padding:0}
+.trend-list li,.direction-list li{padding:10px 0;border-bottom:1px solid var(--border);font-size:.9em}
+.trend-list li:last-child,.direction-list li:last-child{border-bottom:none}
+.trend-list li::before{content:"\1F4C8 ";margin-right:6px}
+.direction-list li::before{content:"\1F4A1 ";margin-right:6px}
 .hidden{display:none}
-.loader{display:inline-block;width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
 .export-section{text-align:center;padding:20px}
 @media(max-width:768px){.form-row,.analysis-grid{grid-template-columns:1fr}header h1{font-size:1.6em}.container{padding:12px}}
 </style>
@@ -74,15 +69,15 @@ header p{color:rgba(255,255,255,.85);font-size:1.1em}
 <body>
 
 <header>
-<h1>🔬 AI 文献调研助手</h1>
-<p>多源检索 · 智能筛选 · 趋势分析 — 高精度跨学科文献调研</p>
+<h1>AI 文献调研助手</h1>
+<p>多源检索 / 智能筛选 / 趋势分析 - 高精度跨学科文献调研</p>
 </header>
 
 <div class="container">
 
 <!-- Step 1: Input -->
 <div class="section" id="input-section">
-<h2>📝 研究方向</h2>
+<h2>研究方向</h2>
 <div class="form-group">
 <label>研究方向（必填）</label>
 <input type="text" id="direction" placeholder="例如：多智能体系统与大模型协作">
@@ -127,31 +122,31 @@ header p{color:rgba(255,255,255,.85);font-size:1.1em}
 </div>
 </div>
 <div class="btn-group">
-<button class="btn btn-primary" id="btn-generate" onclick="generateQueries()">⚡ 生成检索策略</button>
+<button class="btn btn-primary" id="btn-generate" onclick="generateQueries()">生成检索策略</button>
 </div>
 </div>
 
 <!-- Step 2: Queries -->
 <div class="section hidden" id="query-section">
-<h2>🔍 检索策略</h2>
+<h2>检索策略</h2>
 <p style="color:var(--text-dim);font-size:.9em;margin-bottom:8px">根据研究方向自动生成的检索查询组合：</p>
 <div class="queries" id="query-list"></div>
 <div class="btn-group" style="margin-top:16px">
-<button class="btn btn-primary" id="btn-search" onclick="startSearch()">🔎 开始多源检索</button>
-<button class="btn btn-secondary" onclick="regenerateQueries()">🔄 重新生成</button>
+<button class="btn btn-primary" id="btn-search" onclick="startSearch()">开始多源检索</button>
+<button class="btn btn-secondary" onclick="regenerateQueries()">重新生成</button>
 </div>
 </div>
 
 <!-- Step 3: Progress -->
 <div class="section hidden" id="progress-section">
-<h2>⏳ 检索中...</h2>
+<h2>检索中...</h2>
 <div class="progress-bar active"><div class="progress-fill" id="progress-fill"></div></div>
 <div class="status active" id="search-status">准备中...</div>
 </div>
 
 <!-- Step 4: Results -->
 <div class="section hidden" id="results-section">
-<h2>📊 检索结果</h2>
+<h2>检索结果</h2>
 <div class="filter-bar">
 <span class="results-count" id="results-count"></span>
 <select id="sort-by" onchange="sortResults()">
@@ -174,14 +169,14 @@ header p{color:rgba(255,255,255,.85);font-size:1.1em}
 
 <!-- Step 5: Analysis -->
 <div class="section hidden" id="analysis-section">
-<h2>🧠 智能分析报告</h2>
+<h2>智能分析报告</h2>
 <div class="analysis-grid" id="stats-grid"></div>
 <div style="margin-top:20px">
-<h3 style="margin-bottom:10px">📈 研究趋势分析</h3>
+<h3 style="margin-bottom:10px">研究趋势分析</h3>
 <ul class="trend-list" id="trend-list"></ul>
 </div>
 <div style="margin-top:20px">
-<h3 style="margin-bottom:10px">💡 推荐研究方向</h3>
+<h3 style="margin-bottom:10px">推荐研究方向</h3>
 <ul class="direction-list" id="direction-list"></ul>
 </div>
 </div>
@@ -189,498 +184,14 @@ header p{color:rgba(255,255,255,.85);font-size:1.1em}
 <!-- Export -->
 <div class="section hidden" id="export-section">
 <div class="export-section">
-<button class="btn btn-primary" onclick="exportReport()">📄 导出文献调研报告</button>
-<button class="btn btn-secondary" onclick="exportJSON()">📋 导出 JSON 数据</button>
+<button class="btn btn-primary" onclick="exportReport()">导出文献调研报告</button>
+<button class="btn btn-secondary" onclick="exportJSON()">导出 JSON 数据</button>
 </div>
 </div>
 
 </div>
 
-<script>
-// ==================== State ====================
-let state = {
-    direction: '',
-    keywords: [],
-    queries: [],
-    allPapers: [],
-    filteredPapers: [],
-    strategies: ['top-venue', 'high-cite', 'recent']
-};
-
-// ==================== Strategy Tags ====================
-document.querySelectorAll('.tag').forEach(tag => {
-    tag.addEventListener('click', () => {
-        tag.classList.toggle('active');
-        state.strategies = [...document.querySelectorAll('.tag.active')].map(t => t.dataset.val);
-    });
-});
-
-// ==================== Generate Queries ====================
-function generateQueries() {
-    const dir = document.getElementById('direction').value.trim();
-    const kw = document.getElementById('keywords').value.trim();
-    if (!dir || !kw) {
-        alert('请填写研究方向和关键词');
-        return;
-    }
-    state.direction = dir;
-    state.keywords = kw.split(/[,，]/).map(k => k.trim()).filter(Boolean);
-    
-    // Generate combinations
-    const queries = new Set();
-    // Direct direction
-    queries.add(state.direction);
-    // Each keyword pair
-    for (let i = 0; i < state.keywords.length; i++) {
-        queries.add(state.keywords[i]);
-        for (let j = i + 1; j < state.keywords.length; j++) {
-            queries.add(state.keywords[i] + ' ' + state.keywords[j]);
-        }
-    }
-    // Direction + keyword
-    state.keywords.forEach(k => {
-        queries.add(state.direction + ' ' + k);
-    });
-    
-    state.queries = [...queries].slice(0, 8);
-    
-    const list = document.getElementById('query-list');
-    list.innerHTML = state.queries.map(q => `<span class="query-chip">${q}</span>`).join('');
-    
-    document.getElementById('query-section').classList.remove('hidden');
-    document.getElementById('query-section').scrollIntoView({ behavior: 'smooth' });
-}
-
-function regenerateQueries() {
-    generateQueries();
-}
-
-// ==================== Multi-Source Search ====================
-async function startSearch() {
-    document.getElementById('btn-search').disabled = true;
-    document.getElementById('progress-section').classList.remove('hidden');
-    document.getElementById('progress-section').scrollIntoView({ behavior: 'smooth' });
-    
-    state.allPapers = [];
-    const progress = document.getElementById('progress-fill');
-    const status = document.getElementById('search-status');
-    
-    // Search sources sequentially with progress
-    const sources = [
-        { name: 'OpenAlex', fn: searchOpenAlex, weight: 40 },
-        { name: 'Semantic Scholar', fn: searchSemanticScholar, weight: 35 },
-        { name: 'arXiv', fn: searchArxiv, weight: 25 }
-    ];
-    
-    let totalProgress = 0;
-    
-    for (const source of sources) {
-        status.textContent = `正在检索 ${source.name}...`;
-        try {
-            const papers = await source.fn();
-            state.allPapers.push(...papers);
-            status.textContent = `${source.name}: 找到 ${papers.length} 篇`;
-        } catch (e) {
-            status.textContent = `${source.name}: 检索失败 (${e.message})`;
-        }
-        totalProgress += source.weight;
-        progress.style.width = totalProgress + '%';
-        await sleep(500);
-    }
-    
-    // Deduplicate
-    status.textContent = '去重处理中...';
-    progress.style.width = '95%';
-    state.allPapers = deduplicate(state.allPapers);
-    
-    progress.style.width = '100%';
-    status.textContent = `检索完成！共找到 ${state.allPapers.length} 篇论文`;
-    
-    await sleep(800);
-    
-    if (state.allPapers.length > 0) {
-        document.getElementById('results-section').classList.remove('hidden');
-        document.getElementById('analysis-section').classList.remove('hidden');
-        document.getElementById('export-section').classList.remove('hidden');
-        filterResults();
-        generateAnalysis();
-        document.getElementById('results-section').scrollIntoView({ behavior: 'smooth' });
-    } else {
-        status.textContent = '未找到相关论文，请尝试调整关键词';
-    }
-    
-    document.getElementById('btn-search').disabled = false;
-}
-
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-// ==================== OpenAlex API ====================
-async function searchOpenAlex() {
-    const papers = [];
-    for (const q of state.queries.slice(0, 4)) {
-        try {
-            let url = `https://api.openalex.org/works?search=${encodeURIComponent(q)}&per_page=25&sort=cited_by_count:desc`;
-            const field = document.getElementById('field').value;
-            if (field) url += `&filter=concepts.display_name:${field}`;
-            const yr = document.getElementById('yearRange').value;
-            if (yr) {
-                const from = new Date().getFullYear() - parseInt(yr);
-                url += `&filter=publication_year:>${from}`;
-            }
-            const res = await fetch(url);
-            const data = await res.json();
-            if (data.results) {
-                data.results.forEach(p => {
-                    const authors = (p.authorships || []).slice(0, 5).map(a => a.author?.display_name || '').filter(Boolean);
-                    const venue = p.primary_location?.source?.display_name || 
-                                  (p.host_venue && p.host_venue.display_name) || '';
-                    papers.push({
-                        title: p.title || '',
-                        authors: authors,
-                        venue: venue,
-                        year: p.publication_year || 0,
-                        abstract: reconstructAbstract(p.abstract_inverted_index),
-                        citations: p.cited_by_count || 0,
-                        doi: p.doi || '',
-                        url: p.primary_location?.landing_page_url || p.doi || '',
-                        source: 'OpenAlex',
-                        query: q,
-                        isOpenAccess: p.open_access?.is_oa || false
-                    });
-                });
-            }
-        } catch (e) { console.error('OpenAlex error:', e); }
-        await sleep(300);
-    }
-    return papers;
-}
-
-function reconstructAbstract(invIndex) {
-    if (!invIndex) return '';
-    const words = [];
-    for (const [word, positions] of Object.entries(invIndex)) {
-        positions.forEach(pos => words[pos] = word);
-    }
-    return words.join(' ');
-}
-
-// ==================== Semantic Scholar API ====================
-async function searchSemanticScholar() {
-    const papers = [];
-    for (const q of state.queries.slice(0, 4)) {
-        try {
-            let url = `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(q)}&limit=25&fields=title,authors,venue,year,abstract,citationCount,externalIds,openAccessPdf`;
-            const yr = document.getElementById('yearRange').value;
-            if (yr) {
-                const from = new Date().getFullYear() - parseInt(yr);
-                url += `&year=${from}-`;
-            }
-            const res = await fetch(url);
-            const data = await res.json();
-            if (data.data) {
-                data.data.forEach(p => {
-                    papers.push({
-                        title: p.title || '',
-                        authors: (p.authors || []).slice(0, 5).map(a => a.name),
-                        venue: p.venue || '',
-                        year: p.year || 0,
-                        abstract: p.abstract || '',
-                        citations: p.citationCount || 0,
-                        doi: p.externalIds?.DOI || '',
-                        url: p.openAccessPdf?.url || (p.externalIds?.DOI ? `https://doi.org/${p.externalIds.DOI}` : ''),
-                        source: 'Semantic Scholar',
-                        query: q,
-                        isOpenAccess: !!p.openAccessPdf
-                    });
-                });
-            }
-        } catch (e) { console.error('Semantic Scholar error:', e); }
-        await sleep(1000); // Rate limit
-    }
-    return papers;
-}
-
-// ==================== arXiv API ====================
-async function searchArxiv() {
-    const papers = [];
-    for (const q of state.queries.slice(0, 3)) {
-        try {
-            const url = `https://export.arxiv.org/api/query?search_query=all:${encodeURIComponent(q)}&start=0&max_results=20&sortBy=relevance`;
-            const res = await fetch(url);
-            const text = await res.text();
-            const parser = new DOMParser();
-            const xml = parser.parseFromString(text, 'text/xml');
-            const entries = xml.querySelectorAll('entry');
-            entries.forEach(entry => {
-                const title = entry.querySelector('title')?.textContent?.replace(/\s+/g, ' ').trim() || '';
-                const authors = [...entry.querySelectorAll('author name')].map(a => a.textContent).slice(0, 5);
-                const summary = entry.querySelector('summary')?.textContent?.replace(/\s+/g, ' ').trim() || '';
-                const published = entry.querySelector('published')?.textContent || '';
-                const year = parseInt(published.substring(0, 4)) || 0;
-                const link = entry.querySelector('link[rel="alternate"]')?.getAttribute('href') || '';
-                const doi = entry.querySelector('arxiv\:doi, doi')?.textContent || '';
-                papers.push({
-                    title: title,
-                    authors: authors,
-                    venue: 'arXiv',
-                    year: year,
-                    abstract: summary,
-                    citations: 0,
-                    doi: doi,
-                    url: link,
-                    source: 'arXiv',
-                    query: q,
-                    isOpenAccess: true
-                });
-            });
-        } catch (e) { console.error('arXiv error:', e); }
-        await sleep(500);
-    }
-    return papers;
-}
-
-// ==================== Deduplication ====================
-function deduplicate(papers) {
-    const seen = new Set();
-    return papers.filter(p => {
-        const key = p.doi || p.title.toLowerCase().replace(/[^a-z0-9]/g, '').substring(0, 80);
-        if (seen.has(key)) return false;
-        seen.add(key);
-        return true;
-    });
-}
-
-// ==================== Filter & Sort ====================
-function filterResults() {
-    let papers = [...state.allPapers];
-    
-    // Citation filter
-    const minCite = parseInt(document.getElementById('cite-filter').value);
-    document.getElementById('cite-label').textContent = minCite;
-    papers = papers.filter(p => p.citations >= minCite);
-    
-    // Year filter
-    const yearThreshold = parseInt(document.getElementById('year-filter').value);
-    if (yearThreshold > 0) {
-        papers = papers.filter(p => p.year >= yearThreshold);
-    }
-    
-    state.filteredPapers = papers;
-    sortResults();
-}
-
-function sortResults() {
-    const sortBy = document.getElementById('sort-by').value;
-    const papers = [...state.filteredPapers];
-    
-    switch (sortBy) {
-        case 'citations':
-            papers.sort((a, b) => b.citations - a.citations);
-            break;
-        case 'year':
-            papers.sort((a, b) => b.year - a.year);
-            break;
-        case 'relevance':
-            papers.sort((a, b) => {
-                const scoreA = a.citations * 0.4 + (a.year - 2020) * 10 + (a.isOpenAccess ? 5 : 0);
-                const scoreB = b.citations * 0.4 + (b.year - 2020) * 10 + (b.isOpenAccess ? 5 : 0);
-                return scoreB - scoreA;
-            });
-            break;
-    }
-    
-    // Show top 50
-    renderPapers(papers.slice(0, 50));
-    document.getElementById('results-count').textContent = `共 ${papers.length} 篇论文（显示前 ${Math.min(50, papers.length)} 篇）`;
-}
-
-function renderPapers(papers) {
-    const list = document.getElementById('paper-list');
-    list.innerHTML = papers.map((p, i) => `
-        <div class="paper-card" onclick="this.classList.toggle('expanded')">
-            <h3>${i + 1}. ${escapeHtml(p.title)}</h3>
-            <div class="paper-meta">
-                <span>👥 ${p.authors.slice(0, 3).join(', ')}${p.authors.length > 3 ? ' et al.' : ''}</span>
-                <span class="badge">${escapeHtml(p.venue)}</span>
-                <span>📅 ${p.year}</span>
-                <span class="citations">📊 ${p.citations} 引用</span>
-                <span class="badge">${p.source}</span>
-                ${p.isOpenAccess ? '<span style="color:var(--success)">🔓 OA</span>' : ''}
-            </div>
-            <div class="paper-abstract">${escapeHtml(p.abstract || '无摘要')}</div>
-            <div class="paper-actions">
-                ${p.url ? `<a href="${p.url}" target="_blank" onclick="event.stopPropagation()">🔗 查看论文</a>` : ''}
-                ${p.doi ? `<a href="https://doi.org/${p.doi}" target="_blank" onclick="event.stopPropagation()">DOI</a>` : ''}
-            </div>
-        </div>
-    `).join('');
-}
-
-function escapeHtml(str) {
-    if (!str) return '';
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-}
-
-// ==================== Analysis ====================
-function generateAnalysis() {
-    const papers = state.filteredPapers.length > 5 ? state.filteredPapers : state.allPapers;
-    
-    // Stats
-    const totalPapers = papers.length;
-    const totalCitations = papers.reduce((s, p) => s + p.citations, 0);
-    const avgCitations = totalPapers > 0 ? Math.round(totalCitations / totalPapers) : 0;
-    const yearCounts = {};
-    papers.forEach(p => { yearCounts[p.year] = (yearCounts[p.year] || 0) + 1; });
-    const years = Object.keys(yearCounts).filter(y => y > 0).sort();
-    const maxYear = years.length > 0 ? years[years.length - 1] : 'N/A';
-    
-    // Top venues
-    const venueCounts = {};
-    papers.forEach(p => { if (p.venue) venueCounts[p.venue] = (venueCounts[p.venue] || 0) + 1; });
-    const topVenues = Object.entries(venueCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
-    
-    // Most cited
-    const topCited = [...papers].sort((a, b) => b.citations - a.citations).slice(0, 5);
-    
-    document.getElementById('stats-grid').innerHTML = `
-        <div class="stat-card"><div class="num">${totalPapers}</div><div class="label">论文总数</div></div>
-        <div class="stat-card"><div class="num">${totalCitations.toLocaleString()}</div><div class="label">总引用数</div></div>
-        <div class="stat-card"><div class="num">${avgCitations}</div><div class="label">平均引用</div></div>
-        <div class="stat-card"><div class="num">${maxYear}</div><div class="label">最新年份</div></div>
-    `;
-    
-    // Trends
-    const trends = [];
-    if (years.length >= 2) {
-        const recent = yearCounts[maxYear] || 0;
-        const prev = yearCounts[String(parseInt(maxYear) - 1)] || 0;
-        if (recent > prev) trends.push(`${maxYear}年论文数量较前一年增长 ${Math.round((recent - prev) / Math.max(prev, 1) * 100)}%，研究热度上升`);
-        else if (recent < prev) trends.push(`${maxYear}年论文数量有所下降，可能进入稳定期`);
-        else trends.push(`研究产出保持稳定`);
-    }
-    if (topVenues.length > 0) trends.push(`主要发表在 ${topVenues.map(v => v[0]).slice(0, 3).join('、')} 等期刊/会议`);
-    trends.push(`高引论文集中在 "${state.keywords.slice(0, 2).join('" 和 "')}" 相关方向`);
-    if (avgCitations > 20) trends.push(`整体引用水平较高（均${avgCitations}次），表明研究领域活跃`);
-    trends.push(`共涉及 ${Object.keys(venueCounts).length} 个不同期刊/会议来源`);
-    
-    // Open access rate
-    const oaCount = papers.filter(p => p.isOpenAccess).length;
-    const oaRate = totalPapers > 0 ? Math.round(oaCount / totalPapers * 100) : 0;
-    trends.push(`开放获取比例 ${oaRate}%，${oaRate > 60 ? '可获取性较好' : '部分论文需要订阅访问'}`);
-    
-    document.getElementById('trend-list').innerHTML = trends.map(t => `<li>${t}</li>`).join('');
-    
-    // Recommended directions
-    const directions = [];
-    directions.push(`${state.keywords[0] || state.direction} 与 [新领域] 的交叉研究 — 跨学科创新机会`);
-    directions.push(`${state.direction} 的实际应用落地 — 从理论到实践`);
-    if (topCited.length > 0) {
-        directions.push(`基于 "${topCited[0].title.substring(0, 30)}..." 的后续改进研究`);
-    }
-    directions.push(`${state.direction} 的评估方法与基准测试研究`);
-    directions.push(`${state.keywords.join(' + ')} 的融合方法探索`);
-    
-    document.getElementById('direction-list').innerHTML = directions.map(d => `<li>${d}</li>`).join('');
-}
-
-// ==================== Export ====================
-function exportReport() {
-    const papers = state.filteredPapers.length > 0 ? state.filteredPapers : state.allPapers;
-    const topPapers = [...papers].sort((a, b) => b.citations - a.citations).slice(0, 15);
-    
-    let report = `# 文献调研报告
-
-`;
-    report += `## 研究方向
-${state.direction}
-
-`;
-    report += `## 关键词
-${state.keywords.join(', ')}
-
-`;
-    report += `## 检索策略
-${state.queries.map(q => `- ${q}`).join('
-')}
-
-`;
-    report += `## 检索结果概览
-`;
-    report += `- 总论文数: ${papers.length}
-`;
-    report += `- 总引用数: ${papers.reduce((s, p) => s + p.citations, 0)}
-
-`;
-    report += `## 代表性论文 (${topPapers.length} 篇)
-
-`;
-    
-    topPapers.forEach((p, i) => {
-        report += `### ${i + 1}. ${p.title}
-`;
-        report += `- **作者**: ${p.authors.join(', ')}
-`;
-        report += `- **期刊/会议**: ${p.venue}
-`;
-        report += `- **年份**: ${p.year}
-`;
-        report += `- **引用数**: ${p.citations}
-`;
-        if (p.doi) report += `- **DOI**: ${p.doi}
-`;
-        if (p.url) report += `- **链接**: ${p.url}
-`;
-        report += `- **摘要**: ${p.abstract || '无'}
-
-`;
-    });
-    
-    report += `## 研究趋势
-`;
-    document.querySelectorAll('#trend-list li').forEach(li => {
-        report += `- ${li.textContent}
-`;
-    });
-    report += `
-## 推荐研究方向
-`;
-    document.querySelectorAll('#direction-list li').forEach(li => {
-        report += `- ${li.textContent}
-`;
-    });
-    
-    report += `
----
-*由 AI 文献调研助手生成*
-`;
-    
-    downloadFile(report, '文献调研报告.md', 'text/markdown');
-}
-
-function exportJSON() {
-    const papers = state.filteredPapers.length > 0 ? state.filteredPapers : state.allPapers;
-    const data = {
-        direction: state.direction,
-        keywords: state.keywords,
-        queries: state.queries,
-        totalResults: papers.length,
-        papers: papers
-    };
-    downloadFile(JSON.stringify(data, null, 2), '文献调研数据.json', 'application/json');
-}
-
-function downloadFile(content, filename, type) {
-    const blob = new Blob([content], { type: type + ';charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(url);
-}
-</script>
+<script src="app.js"></script>
 
 </body>
 </html>
