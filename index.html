@@ -248,7 +248,7 @@ async function doSearch(){
     var fl=document.getElementById('pfl'),msg=document.getElementById('smsg'),dbst=document.getElementById('dbst');
     var tp=0,badges=[],totalRaw=0;
 
-    // Phase 1: General search (5 databases)
+    // Phase 1: 5数据库通用搜索
     var dbs=[
         {n:'OpenAlex',fn:OpenAlexSearch,w:20},
         {n:'Semantic Scholar',fn:SemanticSearch,w:20},
@@ -265,7 +265,6 @@ async function doSearch(){
         try{
             var papers=await d.fn.search(S.queries.slice(0,2).join(' '));
             totalRaw+=papers.length;
-            // 宽松过滤：只要方向匹配即可
             var filtered=KeywordFilter.filterPapers(papers,S.dirVar,S.kg.length>0?S.kg:null);
             S.all.push.apply(S.all,filtered);
             badges[i]='<span class="db ok">'+d.n+': '+papers.length+'->'+filtered.length+'</span>';
@@ -278,38 +277,44 @@ async function doSearch(){
         await Utils.sleep(300);
     }
 
-    // Phase 2: Venue-specific search (OpenAlex)
+    // Phase 2: 顶刊专项搜索 (OpenAlex venue search)
     if(S.venueQueries.length > 0){
         msg.textContent='Phase 2: 顶刊专项检索...';
-        var venueSearches = S.venueQueries.slice(0,4);
+        var venueSearches = S.venueQueries.slice(0,5);
         for(var vi=0;vi<venueSearches.length;vi++){
-            var vn = venueSearches[vi];
+            var vq = venueSearches[vi];
             try{
-                var vp = await OpenAlexSearch.searchVenue(S.dir, vn);
+                var vp = await OpenAlexSearch.searchVenue(S.dir, vq.fullNames);
                 totalRaw += vp.length;
-                var vf = KeywordFilter.filterPapers(vp, S.dirVar, S.kg.length>0?S.kg:null);
+                // 顶刊用宽松过滤
+                var vf = KeywordFilter.topVenueFilter(vp, S.dirVar);
                 S.all.push.apply(S.all, vf);
-                badges.push('<span class="db ok">顶刊-'+vn.substring(0,15)+': '+vf.length+'篇</span>');
-                dbst.innerHTML=badges.join('');
-            }catch(e){console.error('[Venue]',vn,e)}
-            tp+=5;fl.style.width=Math.min(tp,95)+'%';
+                if(vf.length > 0){
+                    badges.push('<span class="db ok">'+vq.name.toUpperCase()+': '+vf.length+'篇</span>');
+                    dbst.innerHTML=badges.join('');
+                }
+            }catch(e){console.error('[Venue]',vq.name,e)}
+            tp+=4;fl.style.width=Math.min(tp,95)+'%';
             await Utils.sleep(300);
         }
     }
 
-    // Phase 3: Dedup + sort
+    // Phase 3: 去重 + 顶刊标记
     msg.textContent='去重 + 顶刊识别...';fl.style.width='95%';
     S.all=Utils.deduplicate(S.all).filter(KeywordFilter.hasMetadata);
     S.all.forEach(function(p){TopVenue.mark(p)});
+    // 排序：顶刊优先
     S.all.sort(function(a,b){
         if(a.isTop!==b.isTop) return b.isTop?1:-1;
         return (b.citations+b.year*0.1)-(a.citations+a.year*0.1);
     });
-    console.log('[Total] 原始:'+totalRaw+' 匹配:'+S.all.length+' 顶刊:'+S.all.filter(function(p){return p.isTop}).length);
 
-    // Fallback if still 0
-    if(S.all.length===0 && totalRaw>0){
-        msg.textContent='宽松检索...';
+    var topCount=S.all.filter(function(p){return p.isTop}).length;
+    console.log('[Total] 原始:'+totalRaw+' 匹配:'+S.all.length+' 顶刊:'+topCount);
+
+    // Fallback
+    if(S.all.length<5 && totalRaw>0){
+        msg.textContent='结果较少，宽松检索...';
         var allV=[];S.dirVar.forEach(function(v){allV.push(v)});S.kg.forEach(function(g){g.forEach(function(v){allV.push(v)})});
         for(var i=0;i<dbs.length;i++){
             try{
@@ -321,22 +326,22 @@ async function doSearch(){
         S.all=Utils.deduplicate(S.all).filter(KeywordFilter.hasMetadata);
         S.all.forEach(function(p){TopVenue.mark(p)});
         S.all.sort(function(a,b){if(a.isTop!==b.isTop)return b.isTop?1:-1;return b.citations-a.citations});
-        if(S.all.length>0){badges.push('<span class="db wn">已放宽: '+S.all.length+'篇</span>');dbst.innerHTML=badges.join('')}
+        topCount=S.all.filter(function(p){return p.isTop}).length;
+        if(S.all.length>0){badges.push('<span class="db wn">放宽后: '+S.all.length+'篇</span>');dbst.innerHTML=badges.join('')}
     }
 
     fl.style.width='100%';
-    var tc=S.all.filter(function(p){return p.isTop}).length;
     if(S.all.length>0){
-        msg.textContent='完成! '+S.all.length+'篇('+tc+'篇顶刊)';
+        msg.textContent='完成! '+S.all.length+'篇('+topCount+'篇顶刊)';
         await Utils.sleep(500);
         document.getElementById('rs').classList.remove('hid');
         document.getElementById('es').classList.remove('hid');
         doFilter();renderAnalysis();renderProposal();
         document.getElementById('rs').scrollIntoView({behavior:'smooth'});
     }else{
-        msg.textContent='未找到相关论文';
+        msg.textContent='未找到论文';
         var eb=document.createElement('div');eb.className='err-box';
-        eb.innerHTML='<strong>检索失败</strong><br>建议: 1.使用英文关键词 2.减少关键词数量 3.扩大时间范围<br>按F12查看Console日志';
+        eb.innerHTML='<strong>检索失败</strong><br>建议: 1.用英文关键词 2.减少关键词 3.扩大时间范围<br>F12查看日志';
         document.getElementById('ps').appendChild(eb);
     }
     document.getElementById('bs').disabled=false;

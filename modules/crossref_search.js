@@ -2,16 +2,14 @@ var CrossrefSearch = {
     name: 'Crossref',
     search: async function(query) {
         var papers = [];
-        console.log('[Crossref] 查询:', query);
+        console.log('[Crossref] 搜索:', query);
         try {
             var url = 'https://api.crossref.org/works?query=' + encodeURIComponent(query) + '&rows=30&sort=relevance';
             var yr = document.getElementById('yr').value;
             if (yr) url += '&filter=from-pub-date:' + (new Date().getFullYear()-parseInt(yr));
-            console.log('[Crossref] URL:', url);
-            var res = await fetch(url, {headers:{'User-Agent':'LitAssistant/1.0 (mailto:test@test.com)'}});
-            console.log('[Crossref] 状态:', res.status);
+            var res = await fetch(url, {headers:{'User-Agent':'LitAssist/1.0'}});
             var data = await res.json();
-            var count = (data.message&&data.message.items) ? data.message.items.length : 0;
+            var count = (data.message&&data.message.items)?data.message.items.length:0;
             console.log('[Crossref] 返回:', count, '条');
             if (data.message&&data.message.items) data.message.items.forEach(function(p) {
                 var t=(p.title&&p.title[0])||''; if(!t) return;
