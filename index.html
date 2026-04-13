@@ -246,70 +246,89 @@ async function doSearch(){
     document.getElementById('ps').scrollIntoView({behavior:'smooth'});
     S.all=[];
     var fl=document.getElementById('pfl'),msg=document.getElementById('smsg'),dbst=document.getElementById('dbst');
-    var dbs=[
-        {n:'Semantic Scholar',fn:SemanticSearch,w:25},
-        {n:'OpenAlex',fn:OpenAlexSearch,w:25},
-        {n:'arXiv',fn:ArxivSearch,w:17},
-        {n:'Crossref',fn:CrossrefSearch,w:17},
-        {n:'DBLP',fn:DBLPSearch,w:16}
-    ];
     var tp=0,badges=[],totalRaw=0;
+
+    // Phase 1: General search (5 databases)
+    var dbs=[
+        {n:'OpenAlex',fn:OpenAlexSearch,w:20},
+        {n:'Semantic Scholar',fn:SemanticSearch,w:20},
+        {n:'arXiv',fn:ArxivSearch,w:15},
+        {n:'Crossref',fn:CrossrefSearch,w:15},
+        {n:'DBLP',fn:DBLPSearch,w:10}
+    ];
 
     for(var i=0;i<dbs.length;i++){
         var d=dbs[i];
-        msg.textContent='正在检索 '+d.n+'...';
+        msg.textContent='Phase 1: 检索 '+d.n+'...';
         badges.push('<span class="db">'+d.n+': 检索中</span>');
         dbst.innerHTML=badges.join('');
         try{
-            var papers=await d.fn.search(S.queries.slice(0,3).join(' '));
+            var papers=await d.fn.search(S.queries.slice(0,2).join(' '));
             totalRaw+=papers.length;
+            // 宽松过滤：只要方向匹配即可
             var filtered=KeywordFilter.filterPapers(papers,S.dirVar,S.kg.length>0?S.kg:null);
             S.all.push.apply(S.all,filtered);
-            badges[i]='<span class="db ok">'+d.n+': '+papers.length+' -> '+filtered.length+' 篇</span>';
+            badges[i]='<span class="db ok">'+d.n+': '+papers.length+'->'+filtered.length+'</span>';
         }catch(e){
-            badges[i]='<span class="db er">'+d.n+': 失败('+e.message+')</span>';
+            badges[i]='<span class="db er">'+d.n+': '+e.message.substring(0,20)+'</span>';
             console.error('[Search]',d.n,e);
         }
         dbst.innerHTML=badges.join('');
         tp+=d.w;fl.style.width=tp+'%';
-        await Utils.sleep(400);
+        await Utils.sleep(300);
     }
 
+    // Phase 2: Venue-specific search (OpenAlex)
+    if(S.venueQueries.length > 0){
+        msg.textContent='Phase 2: 顶刊专项检索...';
+        var venueSearches = S.venueQueries.slice(0,4);
+        for(var vi=0;vi<venueSearches.length;vi++){
+            var vn = venueSearches[vi];
+            try{
+                var vp = await OpenAlexSearch.searchVenue(S.dir, vn);
+                totalRaw += vp.length;
+                var vf = KeywordFilter.filterPapers(vp, S.dirVar, S.kg.length>0?S.kg:null);
+                S.all.push.apply(S.all, vf);
+                badges.push('<span class="db ok">顶刊-'+vn.substring(0,15)+': '+vf.length+'篇</span>');
+                dbst.innerHTML=badges.join('');
+            }catch(e){console.error('[Venue]',vn,e)}
+            tp+=5;fl.style.width=Math.min(tp,95)+'%';
+            await Utils.sleep(300);
+        }
+    }
+
+    // Phase 3: Dedup + sort
     msg.textContent='去重 + 顶刊识别...';fl.style.width='95%';
     S.all=Utils.deduplicate(S.all).filter(KeywordFilter.hasMetadata);
     S.all.forEach(function(p){TopVenue.mark(p)});
-    // Sort: top venue first, then citations
     S.all.sort(function(a,b){
         if(a.isTop!==b.isTop) return b.isTop?1:-1;
         return (b.citations+b.year*0.1)-(a.citations+a.year*0.1);
     });
-    console.log('[Result] 严格: '+S.all.length+' 篇 (原始: '+totalRaw+')');
+    console.log('[Total] 原始:'+totalRaw+' 匹配:'+S.all.length+' 顶刊:'+S.all.filter(function(p){return p.isTop}).length);
 
-    // Fallback
+    // Fallback if still 0
     if(S.all.length===0 && totalRaw>0){
-        msg.textContent='严格匹配无结果，宽松检索...';
-        var allV=[];
-        S.dirVar.forEach(function(v){allV.push(v)});
-        S.kg.forEach(function(g){g.forEach(function(v){allV.push(v)})});
+        msg.textContent='宽松检索...';
+        var allV=[];S.dirVar.forEach(function(v){allV.push(v)});S.kg.forEach(function(g){g.forEach(function(v){allV.push(v)})});
         for(var i=0;i<dbs.length;i++){
             try{
                 var papers=await dbs[i].fn.search(S.dir);
                 var loose=KeywordFilter.looseFilter(papers,allV);
                 S.all.push.apply(S.all,loose);
-            }catch(e){console.error('[Fallback]',dbs[i].n,e)}
+            }catch(e){}
         }
         S.all=Utils.deduplicate(S.all).filter(KeywordFilter.hasMetadata);
         S.all.forEach(function(p){TopVenue.mark(p)});
-        S.all.sort(function(a,b){if(a.isTop!==b.isTop)return b.isTop?1:-1;return(b.citations+b.year*0.1)-(a.citations+a.year*0.1)});
-        if(S.all.length>0){badges.push('<span class="db wn">已放宽: '+S.all.length+' 篇</span>');dbst.innerHTML=badges.join('')}
+        S.all.sort(function(a,b){if(a.isTop!==b.isTop)return b.isTop?1:-1;return b.citations-a.citations});
+        if(S.all.length>0){badges.push('<span class="db wn">已放宽: '+S.all.length+'篇</span>');dbst.innerHTML=badges.join('')}
     }
 
     fl.style.width='100%';
     var tc=S.all.filter(function(p){return p.isTop}).length;
-
     if(S.all.length>0){
-        msg.textContent='完成！'+S.all.length+'篇论文（'+tc+'篇顶刊）';
-        await Utils.sleep(600);
+        msg.textContent='完成! '+S.all.length+'篇('+tc+'篇顶刊)';
+        await Utils.sleep(500);
         document.getElementById('rs').classList.remove('hid');
         document.getElementById('es').classList.remove('hid');
         doFilter();renderAnalysis();renderProposal();
@@ -317,7 +336,7 @@ async function doSearch(){
     }else{
         msg.textContent='未找到相关论文';
         var eb=document.createElement('div');eb.className='err-box';
-        eb.innerHTML='<strong>检索失败</strong><br>建议：1.使用更通用的研究方向 2.减少关键词 3.扩大时间范围 4.使用英文<br>按F12查看Console日志';
+        eb.innerHTML='<strong>检索失败</strong><br>建议: 1.使用英文关键词 2.减少关键词数量 3.扩大时间范围<br>按F12查看Console日志';
         document.getElementById('ps').appendChild(eb);
     }
     document.getElementById('bs').disabled=false;

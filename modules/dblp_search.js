@@ -4,11 +4,12 @@ var DBLPSearch = {
         var papers = [];
         console.log('[DBLP] 查询:', query);
         try {
-            var url = 'https://dblp.org/search/publ/api?q=' + encodeURIComponent(query) + '&format=json&h=25';
+            var url = 'https://dblp.org/search/publ/api?q=' + encodeURIComponent(query) + '&format=json&h=30';
             console.log('[DBLP] URL:', url);
             var res = await fetch(url);
             var data = await res.json();
-            console.log('[DBLP] 返回:', (data.result&&data.result.hits)?data.result.hits['@total']:0, '条');
+            var total = (data.result&&data.result.hits) ? data.result.hits['@total'] : 0;
+            console.log('[DBLP] 返回:', total, '条');
             if (data.result&&data.result.hits&&data.result.hits.hit) data.result.hits.hit.forEach(function(hit) {
                 var i=hit.info; if(!i||!i.title) return;
                 var t=(typeof i.title==='string')?i.title:(i.title.text||i.title['#text']||'');

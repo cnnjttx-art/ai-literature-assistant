@@ -4,7 +4,11 @@ var ArxivSearch = {
         var papers = [];
         console.log('[arXiv] 查询:', query);
         try {
-            var url = 'https://export.arxiv.org/api/query?search_query=all:' + encodeURIComponent(query) + '&start=0&max_results=25&sortBy=relevance';
+            // arXiv 支持 AND 逻辑
+            // 将查询拆分并用 AND 连接
+            var terms = query.split(/\s+/).filter(Boolean);
+            var searchTerms = terms.map(function(t) { return 'all:' + t; }).join('+AND+');
+            var url = 'https://export.arxiv.org/api/query?search_query=' + searchTerms + '&start=0&max_results=30&sortBy=relevance';
             console.log('[arXiv] URL:', url);
             var res = await fetch(url);
             var text = await res.text();

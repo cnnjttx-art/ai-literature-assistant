@@ -4,14 +4,19 @@ var SemanticSearch = {
         var papers = [];
         console.log('[S2] 查询:', query);
         try {
-            var url = 'https://api.semanticscholar.org/graph/v1/paper/search?query=' + encodeURIComponent(query) + '&limit=30&fields=title,authors,venue,year,abstract,citationCount,externalIds,openAccessPdf';
+            // S2 用空格分隔关键词，内部做 AND 匹配
+            var url = 'https://api.semanticscholar.org/graph/v1/paper/search?query=' + encodeURIComponent(query) + '&limit=40&fields=title,authors,venue,year,abstract,citationCount,externalIds,openAccessPdf';
             var yr = document.getElementById('yr').value;
             if (yr) url += '&year=' + (new Date().getFullYear()-parseInt(yr)) + '-';
             console.log('[S2] URL:', url);
             var res = await fetch(url);
             console.log('[S2] 状态:', res.status);
+            if (!res.ok) {
+                console.error('[S2] HTTP错误:', res.status, res.statusText);
+                return papers;
+            }
             var data = await res.json();
-            console.log('[S2] 返回:', data.total || 0, '条');
+            console.log('[S2] 返回 total:', data.total || 0, ' data:', (data.data||[]).length);
             if (data.data) data.data.forEach(function(p) {
                 if (!p.title) return;
                 papers.push(PaperFormat.create({title:p.title,authors:(p.authors||[]).slice(0,5).map(function(a){return a.name}),venue:p.venue||'',year:p.year||0,abstract:p.abstract||'',citations:p.citationCount||0,doi:(p.externalIds&&p.externalIds.DOI)||'',url:(p.openAccessPdf&&p.openAccessPdf.url)||((p.externalIds&&p.externalIds.DOI)?'https://doi.org/'+p.externalIds.DOI:''),source:'Semantic Scholar',isOpenAccess:!!p.openAccessPdf}));
