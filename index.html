@@ -193,7 +193,7 @@ function doQuery(){
     }
     console.log('[Discipline] 识别:', S.disciplines);
     // Get top venues for disciplines
-    S.venueQueries=TopVenue.getTopVenuesForDisciplines(S.disciplines);
+    S.venueQueries=TopVenue.getVenueQueries(S.disciplines);
     console.log('[Venues] 目标顶刊:', S.venueQueries);
     // Direction variants
     S.dirVar=Translator.getVariants(dir);
